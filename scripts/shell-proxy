@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+tmpfile=$(mktemp)
+
+while read line; do
+    echo $line >> $tmpfile
+done
+
+xterm -e ~/test/email/arsys/htmlmail/html-mailer -m $tmpfile $@ &
+
+
