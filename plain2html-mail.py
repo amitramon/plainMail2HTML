@@ -120,8 +120,9 @@ def main():
 
         fp = open(message_file) if message_file else sys.stdin
         html_msg = mp.generate_html_msg_from_file(fp)
-        sendmail(html_msg, sendmail_args)
-
+        # sendmail(html_msg, sendmail_args)
+        sys.stdout.write(html_msg)
+        
     except Exception, e:
         if settings.DEBUG:
             import traceback
