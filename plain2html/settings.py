@@ -45,7 +45,7 @@ RESTRUCTUREDTEXT_FILTER_SETTINGS = {
     'stylesheet_path': ''       # code, either inline or linked.
     }
 
-DEBUG = True
+DEBUG = False
 
 # The command to use for sending the mail. It should be the command
 # your MUA (mail client) would usually use.
