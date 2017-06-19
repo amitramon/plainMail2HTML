@@ -62,6 +62,8 @@ def get_callback(callback_str):
     # import pdb;pdb.set_trace()
     return getattr(sys.modules[mod_name], func_name)
 
+
+
 def get_args():
 
     parser = argparse.ArgumentParser(
@@ -72,33 +74,17 @@ def get_args():
                         default=sys.stdin,
                         help='an email file to process.')
     
-    parser.add_argument('-s', '--send_mail', action='store_true',
-                        help='send the mail (instead of writing it to stdout).')
-
     parser.add_argument('-d', '--debug', action='store_true',
                         help='break into debugger.')
 
-    parser.add_argument('sendmail_args', nargs=argparse.REMAINDER,
-                        help='possibly arguments for sendmail command.')
+    # parser.add_argument('sendmail_args', nargs=argparse.REMAINDER,
+    #                     help='possibly arguments for sendmail command.')
 
-    # parser = argparse.ArgumentParser(description='Test argparse')
-    
-    # parser.add_argument('-v', '--verbose', action='store_true')
+    return parser.parse_args()
 
-    # parser.add_argument('cmd_args', nargs=argparse.REMAINDER)
-
-  
-    args = parser.parse_args()
-
-    # in my opinion argparse should strip the '--'. could this be a bug?
-    if args.sendmail_args and args.sendmail_args[0] == '--':
-        args.sendmail_args = args.sendmail_args[1:]
-        
-    return args
     
 def print_args(args):
     print(args)
-
 
     
 def main():
@@ -107,7 +93,7 @@ def main():
     args = get_args()
 
     print_args(args)
-    # sys.exit()
+    #sys.exit()
     
     try:
         if args.debug:           # a hack for development stage.
@@ -119,14 +105,7 @@ def main():
 
         html_msg = mp.generate_html_msg_from_file(args.message_file)
 
-        if args.send_mail:
-            print('send mail')
-            print(args.sendmail_args)
-            print(' '.join(args.sendmail_args))
-            # sendmail(html_msg, args.sendmail_args)
-        else:
-            print('dump')
-            sys.stdout.write(str(html_msg))
+        sys.stdout.write(str(html_msg))
         
     except Exception as e:
         if settings.DEBUG:
