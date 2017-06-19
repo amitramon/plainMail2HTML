@@ -34,9 +34,6 @@ QUOTE_INDENT = ' ' * 2
 # The pattern identifying quoted text.
 QUOTE_PATTERN = r"^>[>\t ]*"
 
-# Not in use.
-# QUOTE_PREFIX = '> '
-
 # Passed over to the rst parser.
 RESTRUCTUREDTEXT_FILTER_SETTINGS = {
     'halt_level': 2,
