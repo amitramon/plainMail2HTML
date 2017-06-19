@@ -38,11 +38,11 @@ def sendmail(msg, extra_args=None):
     if send_mail.returncode:
         msg = 'sendmail: error %d. %s' % \
             (send_mail.returncode, stdoutdata if stdoutdata else '')
-        raise Exception, msg
+        raise Exception(msg)
 
     # This occurs either if there is an error, or the sendmail command
     # is defined as ``cat`` or in a similar way for debbuging purposes.
     if stdoutdata:
-        print "Command output"
-        print "=============="
-        print stdoutdata
+        print("Command output")
+        print("==============")
+        print(stdoutdata)

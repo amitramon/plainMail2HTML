@@ -97,7 +97,7 @@ def get_args():
     return args
     
 def print_args(args):
-    print args
+    print(args)
 
 
     
@@ -120,20 +120,20 @@ def main():
         html_msg = mp.generate_html_msg_from_file(args.message_file)
 
         if args.send_mail:
-            print 'send mail'
-            print args.sendmail_args
-            print ' '.join(args.sendmail_args)
+            print('send mail')
+            print(args.sendmail_args)
+            print(' '.join(args.sendmail_args))
             # sendmail(html_msg, args.sendmail_args)
         else:
-            print 'dump'
+            print('dump')
             sys.stdout.write(str(html_msg))
         
-    except Exception, e:
+    except Exception as e:
         if settings.DEBUG:
             import traceback
             traceback.print_exc()
         else:
-            print e
+            print(e)
         sys.exit(1)
     else:
         sys.exit()

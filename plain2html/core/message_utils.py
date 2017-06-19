@@ -42,7 +42,7 @@ def convert_text_to_alternative(msg):
     new_msg.set_unixfrom(msg.get_unixfrom())
     new_msg.set_charset(msg.get_charset())
     
-    for key in msg.keys():
+    for key in list(msg.keys()):
         if is_header_okay(key):
             new_msg.add_header(key, msg[key])
 
