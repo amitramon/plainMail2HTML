@@ -36,7 +36,7 @@ See also the settings file for important plainMail2HTML configuration.
 
 """
 
-import getopt
+import argparse
 import sys
 
 from plain2html import settings
@@ -44,23 +44,9 @@ from plain2html.core.sendmail import sendmail
 from plain2html.core.message_processor import MessageProcessor
 
 __usage__ = """
-Usage: cat <file> | html-mailer [options]
-       html-mailer [options]
-Create and attach a HTML message to a given email message,
-then send it.
-
-Options:
-  -h, --help               print brief usage message.
-  -m, --message-file       an email file to process.
-  -q, --quote-prefix       the prefix used to quote text when replying.
-  -d, --debug              break into debugger.
+   cat <file> | html-mailer [options]
+   html-mailer [options]
 """
-
-def usage():
-    print __usage__
-
-_short_opt = 'hdm:q:'
-_long_opt = ('help', 'message-file=', 'quote-prefix=', 'debug')
 
 def get_callback(callback_str):
     """Return a function reference for the function name.
@@ -76,52 +62,71 @@ def get_callback(callback_str):
     # import pdb;pdb.set_trace()
     return getattr(sys.modules[mod_name], func_name)
 
+def get_args():
+
+    parser = argparse.ArgumentParser(
+        description='Create a HTML message part for a given email message and attach it to the message.',
+        usage=__usage__)
+    
+    parser.add_argument('-m', '--message_file', type=argparse.FileType('r'),
+                        default=sys.stdin,
+                        help='an email file to process.')
+    
+    parser.add_argument('-s', '--send_mail', action='store_true',
+                        help='send the mail (instead of writing it to stdout).')
+
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='break into debugger.')
+
+    parser.add_argument('sendmail_args', nargs=argparse.REMAINDER,
+                        help='possibly arguments for sendmail command.')
+
+    # parser = argparse.ArgumentParser(description='Test argparse')
+    
+    # parser.add_argument('-v', '--verbose', action='store_true')
+
+    # parser.add_argument('cmd_args', nargs=argparse.REMAINDER)
+
+  
+    args = parser.parse_args()
+
+    # in my opinion argparse should strip the '--'. could this be a bug?
+    if args.sendmail_args and args.sendmail_args[0] == '--':
+        args.sendmail_args = args.sendmail_args[1:]
+        
+    return args
+    
+def print_args(args):
+    print args
+
+
+    
 def main():
     """The main function."""
 
-    try:
-        opts, sendmail_args = getopt.getopt(sys.argv[1:], _short_opt, _long_opt)
-    except getopt.GetoptError, err:
-        # print help information and exit:
-        print str(err) # will print something like "option -a not recognized"
-        usage()
-        sys.exit(2)
-    
-    message_file = None
-    verbose = False
-    quote_prefix = getattr(settings, 'QUOTE_PREFIX', '>')
-    html_direction_rtl = False
-    dbg_break = False
+    args = get_args()
 
-    for o, a in opts:
-        if o == "-v":
-            verbose = True
-        elif o in ("-h", "--help"):
-            usage()
-            sys.exit()
-        elif o in ("-m", "--message-file"):
-            message_file = a
-        elif o in ("-q", "--quote-prefix"):
-            quote_prefix = a
-        elif o in ("-r", "--rtl"):
-            html_direction_rtl = True
-        elif o in ("-d", "--debug"):
-            dbg_break = True
-        else:
-            assert False, "unhandled option"
- 
+    print_args(args)
+    # sys.exit()
+    
     try:
-        if dbg_break:           # a hack for development stage.
+        if args.debug:           # a hack for development stage.
             import pdb
             pdb.set_trace()
 
         html_parser = get_callback(settings.HTML_PARSER)
         mp = MessageProcessor(html_parser=html_parser)
 
-        fp = open(message_file) if message_file else sys.stdin
-        html_msg = mp.generate_html_msg_from_file(fp)
-        # sendmail(html_msg, sendmail_args)
-        sys.stdout.write(str(html_msg))
+        html_msg = mp.generate_html_msg_from_file(args.message_file)
+
+        if args.send_mail:
+            print 'send mail'
+            print args.sendmail_args
+            print ' '.join(args.sendmail_args)
+            # sendmail(html_msg, args.sendmail_args)
+        else:
+            print 'dump'
+            sys.stdout.write(str(html_msg))
         
     except Exception, e:
         if settings.DEBUG:
