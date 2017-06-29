@@ -1,5 +1,30 @@
 # plainMail2HTML
 
+
+"""Add text/HTML component to text/plain Email message.
+
+plain2html read an Email message that contains only a text/plain
+component, generate a corresponding text/HTML component, and add it to
+the message. The text/HTML component is formatted according to markup
+formatting directives (e.g. reStructuredText) that may exist in the
+text.
+
+The input text/plain Email message is read either from the standard
+output or from a file, and the output Email is written to the standard
+output.
+
+plain2html was written with the Mutt Email client in mind, in order to
+facilitate sending HTML-formatted Email messages from a text-only
+Email client. However, it is a general tool so it should be possibly
+to use it with other Email clients and for other usages.
+
+For Mutt, the typical usage is to define the following definition in
+Mutt's configuration file:
+
+sendmail="plain2html-mail.py -- $@"
+
+See also the settings file for important plainMail2HTML configuration.
+
 ## About
 
 plainMail2HTML is a tool that creates and attaches a HTML part to an
