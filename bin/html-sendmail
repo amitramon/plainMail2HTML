@@ -1,0 +1,100 @@
+#!/bin/bash
+
+# plainMail2HTML - Convert a text/plain Email to plain+HTML Email.
+#
+# Copyright (C) 2016 Amit Ramon <amit.ramon@riseup.net>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Shell script that replace 'sendmail' or similar commands that
+# are used to send Email message piped into them.
+#
+# This script reads an Email message from the standard input, pipe it
+# into 'plain2html' that adds a HTML component to it, and then pipe
+# the resulting Email message into 'sendmail' (or to a similar tool).
+#
+# This script is designed for transparently replacing the 'sendmail'
+# commang in Mutt Email client, so from Mutt's point of view it looks
+# like a regular sendmail command. However, when using this script an
+# HTML component is added to the original message.
+
+set -uf -o pipefail
+
+PATH=/bin:/usr/bin
+export PATH
+
+# Full path to the mail HTML template used for creating the HTML part.
+# If not set, default is used.
+# PLAIN_TO_HTML_TEMPLATE=$HOME/programs/plainMail2HTML/templates/template.html
+# export PLAIN_TO_HTML_TEMPLATE
+
+base_dir=$(dirname $(realpath $0))
+plain_mail_to_html=$base_dir/plain2html
+PYTHONPATH=$(dirname $base_dir):$PYTHONPATH
+export PYTHONPATH
+
+# Use sendmail (e.g. exim4, postfix)...
+# sendmail_cmd="/usr/sbin/sendmail -oi"
+# Or msmtp
+sendmail_cmd="/usr/bin/msmtp"
+
+# exit cleanup handler
+on_exit()
+{
+    [[ -e $tmpfile ]] && rm "$tmpfile"
+    exit $status
+}
+
+status=0
+tmpfile=$(mktemp -t mutt-message-file.XXXXXXXX)
+
+trap on_exit INT TERM EXIT
+
+# Piping directly into sendmail is possible, but the mail will then be
+# sent even when markup parsing error occurs. To avoid that and be able
+# to exit before the mail is sent, separate into two steps.
+
+#--------------------------------------------------
+# parsing markup and write email into temp file
+#--------------------------------------------------
+
+# You can use lbdb (The Little Brother's Database) for extracting
+# Email addresses from Emails you send
+# Use lbdb:
+tee >(lbdb-fetchaddr -a -c utf-8) | $plain_mail_to_html > $tmpfile
+# Don't use lbdb:
+# $plain_mail_to_html > $tmpfile
+
+status=$?
+
+if (( $status ))
+then
+    printf "Error parsing mail (exit code %s)\n" $status >&2
+    on_exit $status
+fi
+
+#--------------------------------------------------
+# parsed successfully, so send the mail
+#--------------------------------------------------
+cat $tmpfile | $sendmail_cmd $@
+status=$?
+
+if (( $status ))
+then
+    printf "Error sending mail (exit code %s)\n" $status >&2
+    on_exit $status
+fi
+
+on_exit $status
+

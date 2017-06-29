@@ -1,0 +1,98 @@
+#!/usr/bin/env python
+
+# plainMail2HTML - Convert a text/plain Email to plain+HTML Email.
+#
+# Copyright (C) 2016 Amit Ramon <amit.ramon@riseup.net>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Add text/HTML component to text/plain Email message.
+
+plain2html read an Email message that contains only a text/plain
+component, generate a corresponding text/HTML component, and add it to
+the message. The text/HTML component is formatted according to markup
+formatting directives (e.g. reStructuredText) that may exist in the
+text.
+
+The input text/plain Email message is read either from the standard
+output or from a file, and the output Email is written to the standard
+output.
+"""
+
+import argparse
+import sys
+
+from plain2html import settings
+from plain2html.core.message_processor import MessageProcessor
+
+__usage__ = """
+   cat <file> | plain2html [options]
+   plain2html [options]
+"""
+
+def get_callback(callback_str):
+    """Convert a function string to a function reference"""
+    
+    # This is a quick-n-dirty patch. Need especially better error
+    # handling.
+    dot = callback_str.rindex('.')
+    mod_name, func_name = callback_str[:dot], callback_str[dot+1:]
+    __import__(mod_name)
+    return getattr(sys.modules[mod_name], func_name)
+
+
+def get_args():
+    """Parse command line arguments"""
+    
+    description = """Create a HTML message part for a given email
+                     message and attach it to the message"""
+    
+    parser = argparse.ArgumentParser(description=description, usage=__usage__)
+    
+    parser.add_argument('-m', '--message_file', type=argparse.FileType('r'),
+                        default=sys.stdin,
+                        help='an email file to process.')
+    
+    return parser.parse_args()
+
+    
+def main():
+    """The main function."""
+
+    args = get_args()
+
+    try:
+        # Obtain handle to the html parsing function
+        html_parser = get_callback(settings.HTML_PARSER)
+
+        # Initialize a  MessageProcessor instance
+        mp = MessageProcessor(html_parser=html_parser)
+        
+        # Create the HTML part and attach it to the message
+        html_msg = mp.generate_html_msg_from_file(args.message_file)
+
+        sys.stdout.write(str(html_msg))
+        
+    except Exception as e:
+        if settings.DEBUG:
+            import traceback
+            traceback.print_exc()
+        else:
+            print(e)
+        sys.exit(1)
+    else:
+        sys.exit()
+
+if __name__ == '__main__':
+    main()

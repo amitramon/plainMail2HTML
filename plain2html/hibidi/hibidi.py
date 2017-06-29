@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+# This code was developed by Beni Cherniavsky and is used here with
+# his generous permission. The original code can be obtaiend at
+# http://cben-hacks.sourceforge.net/bidi/hibidi.py and you can also
+# read about it and get a link to it at
+# http://docutils.sourceforge.net/FAQ.html#bidi
+#
+# All I did was converting it to Python 3.
+
 """Quick-and-dirty approximation of hibidi on XHTML.
 
 This doesn't really perform the bidi algorithm at each level.
@@ -66,7 +74,7 @@ def infer_dirs(node):
     if node.nodeType != Node.ELEMENT_NODE:
         return ''
     # recurse anyway - to infer dir of all elements
-    dirs = map(infer_dirs, node.childNodes)
+    dirs = list(map(infer_dirs, node.childNodes))
     # first strong dir will be returned.
     def gen_dirs():
         # explicit dir attr?
@@ -103,9 +111,9 @@ def assign_dirs(node, base_dir=''):
         assign_dirs(child, node.dir)
 
 LRM = Text()
-LRM.data = u'\N{LEFT-TO-RIGHT MARK}'
+LRM.data = '\N{LEFT-TO-RIGHT MARK}'
 RLM = Text()
-RLM.data = u'\N{RIGHT-TO-LEFT MARK}'
+RLM.data = '\N{RIGHT-TO-LEFT MARK}'
 
 def apply_dirs(node, base_dir=''):
     """Create dir attributes where needed."""

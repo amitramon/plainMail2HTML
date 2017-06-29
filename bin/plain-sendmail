@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# plainMail2HTML - Convert a text/plain Email to plain+HTML Email.
+#
+# Copyright (C) 2016 Amit Ramon <amit.ramon@riseup.net>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Shell script that replace 'sendmail' or similar commands that
+# are used to send Email message piped into them.
+#
+# This script reads an Email message from the standard input, pipe it
+# into 'plain2html' that adds a HTML component to it, and then pipe
+# the resulting Email message into 'sendmail' (or to a similar tool).
+#
+# All this script does is designed piping the Email first through lbdb
+# for fetching Email adresses it might contain. Actually it has
+# nothing to do with HTML, but it is provided here as the 'plain'
+# counterpart of the HTML Email filter.
+
+set -uf -o pipefail
+
+PATH=/bin:/usr/bin
+export PATH
+
+# Use sendmail (e.g. exim4, postfix)...
+# sendmail_cmd="/usr/sbin/sendmail -oi"
+# Or msmtp
+sendmail_cmd="/usr/bin/msmtp"
+
+#--------------------------------------------------
+# send the mail
+#--------------------------------------------------
+
+# Use lbdb (The Little Brother's Database) for extracting
+# Email addresses from Emails you send
+tee >(lbdb-fetchaddr -a -c utf-8) | $sendmail_cmd $@
+status=$?
+
+if (( $status ))
+then
+    printf "Error sending mail (exit code %s)\n" $status >&2
+fi
+
+exit $status
