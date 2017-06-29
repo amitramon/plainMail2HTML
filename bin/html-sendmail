@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Filter mail via lbdb to fetch email address, and pass it over to the HTML mail generator.
+
+set -uf -o pipefail
+
+PATH=/bin:/usr/bin
+export PATH
+
+# Full path to the mail HTML template, used for creating the HTML part
+MUTT_HTML_TEMPLATE=$HOME/programs/plainMail2HTML/templates/template.html
+export MUTT_HTML_TEMPLATE
+
+#plain_mail_to_html=$HOME/programs/plainMail2HTML/plain2html-mail.py
+base_dir=$(dirname $(realpath $0))
+plain_mail_to_html=$base_dir/plain2html
+PYTHONPATH=$(dirname $base_dir):$PYTHONPATH
+export PYTHONPATH
+
+# Use sendmail (e.g. exim4, postfix)...
+# sendmail_cmd="/usr/sbin/sendmail -oi"
+# Or msmtp
+sendmail_cmd="/usr/bin/msmtp"
+
+on_exit()
+{
+    [[ -e $tmpfile ]] && rm "$tmpfile"
+    exit $status
+}
+
+status=0
+tmpfile=$(mktemp -t mutt-message-file.XXXXXXXX)
+
+trap on_exit INT TERM EXIT
+
+# Piping directly into sendmail is possible, but the mail will then be
+# sent even when markup parsing error occurs. To avoid that and be able
+# to exit before the mail is sent, separate into two steps.
+
+#--------------------------------------------------
+# parsing markup and write email into temp file
+#--------------------------------------------------
+
+# You can use lbdb (The Little Brother's Database) for extracting
+# Email addresses from Emails you send
+# Use lbdb:
+tee >(lbdb-fetchaddr -a -c utf-8) | $plain_mail_to_html > $tmpfile
+# Don't use lbdb:
+# $plain_mail_to_html > $tmpfile
+
+status=$?
+
+if (( $status ))
+then
+    printf "Error parsing mail (exit code %s)\n" $status >&2
+    on_exit $status
+fi
+
+#--------------------------------------------------
+# parsed successfully, so send the mail
+#--------------------------------------------------
+cat $tmpfile | $sendmail_cmd $@
+status=$?
+
+if (( $status ))
+then
+    printf "Error sending mail (exit code %s)\n" $status >&2
+    on_exit $status
+fi
+
+on_exit $status
+
