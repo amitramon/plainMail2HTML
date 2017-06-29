@@ -1,23 +1,23 @@
-# Author: Amit Ramon <amitrm@users.sourceforge.net>
-
-# This file is part of plainMail2HTML.
-
-# plainMail2HTML is free software: you can redistribute it and/or modify
+# plainMail2HTML - Convert a text/plain Email to plain+HTML Email.
+#
+# Copyright (C) 2016 Amit Ramon <amit.ramon@riseup.net>
+#
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-
-# plainMail2HTML is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
 # You should have received a copy of the GNU General Public License
-# along with plainMail2HTML.  If not, see
-# <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""
-A bunch of utilities to process email messages.
+"""plainMail2HTML Email message utilities
+
+A couple of utilities for processing Email messages.
 """
 
 import re
@@ -26,17 +26,21 @@ from email.mime.text import MIMEText
 from email.feedparser import FeedParser
 from plain2html import settings
 
-# list of email headers that shouldn't
+# List of email headers that shouldn't
 # be copied when cloning a new message
 # from a different one.
 header_blacklist = ('content-disposition', 'content-type',
                     'mime-version', 'content-transfer-encoding')
 
 def is_header_okay(header):
+    """Test that the header is allowed"""
+
     return not header.lower() in header_blacklist
 
 
 def convert_text_to_alternative(msg):
+    """Convert Email message type to multipart/alternative"""
+    
     # Create message container - the correct MIME type is multipart/alternative.
     new_msg = MIMEMultipart('alternative')
     new_msg.set_unixfrom(msg.get_unixfrom())
@@ -50,10 +54,10 @@ def convert_text_to_alternative(msg):
 
 
 def load_message(fp):
-    """Load message from a file handle.
+    """Load an Email message from a file handle
 
     Reads data from a file handler and parse it
-    to a message object.
+    to an Email message object.
     """
     parser = FeedParser()
     for line in fp.readlines():
@@ -63,6 +67,8 @@ def load_message(fp):
         
 
 def load_template(template, body):
+    """Combine message body with a template"""
+    
     fp = open(template)
     template = fp.read()
     fp.close()
@@ -78,6 +84,8 @@ DEFAULT_QUOTE_PATTERN = r"^>[>\t ]*"
 # stay at the beginning of line.
 
 def indent_quoted_text(text):
+    """Convert 'old-style' Email quoted text to indented text"""
+
     # matching till last space and removing match causes loosing
     # previous indentation. however, without it, indentation can become
     # uneven, causing rst to complain. this means that text which is

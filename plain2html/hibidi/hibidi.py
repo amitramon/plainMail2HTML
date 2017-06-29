@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+# This code was developed by Beni Cherniavsky and is used here with
+# his generous permission. The original code can be obtaiend at
+# http://cben-hacks.sourceforge.net/bidi/hibidi.py and you can also
+# read about it and get a link to it at
+# http://docutils.sourceforge.net/FAQ.html#bidi
+#
+# All I did was converting it to Python 3.
+
 """Quick-and-dirty approximation of hibidi on XHTML.
 
 This doesn't really perform the bidi algorithm at each level.
