@@ -1,0 +1,17 @@
+# -*- muttrc -*-
+
+# simply use 'standard' command
+set sendmail = /usr/bin/msmtp
+# or you may use the script provided by plainMail2HTML for having more
+# control, e.g. for using lbdb
+# set sendmail = ~/plainMail2HTML/bin/html-sendmail
+
+# To have visual state indication, you can catenate this variable's
+# value to you Mutt's status line or title. If you do so, you might
+# want to add the command <refresh> to the end of the macro below,
+# just after the command <enter>.
+set my_sendmail_desc="[Text]"
+
+macro generic,pager,compose "\cS" \
+"<enter-command> source ~/.mutt/sendmail-html.rc<enter>" \
+"Toggle sent mail format (plain/html)."

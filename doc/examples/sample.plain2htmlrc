@@ -1,0 +1,6 @@
+# -*-shell-script-*-
+
+# Use sendmail (e.g. exim4, postfix)...
+# sendmail_cmd="/usr/sbin/sendmail -oi"
+# Or msmtp
+sendmail_cmd=/usr/bin/msmtp

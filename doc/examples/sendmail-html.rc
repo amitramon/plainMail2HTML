@@ -1,0 +1,13 @@
+# -*- muttrc -*-
+
+set sendmail = ~/plainMail2HTML/bin/html-sendmail
+
+# To have visual state indication, you can catenate this variable's
+# value to you Mutt's status line or title. If you do so, you might
+# want to add the command <refresh> to the end of the macro below,
+# just after the command <enter>.
+set my_sendmail_desc="[HTML]"
+
+macro generic,pager,compose "\cS" \
+"<enter-command> source ~/.mutt/sendmail-plain.rc<enter>" \
+"Toggle sent mail format (plain/html)."
