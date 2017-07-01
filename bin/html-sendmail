@@ -44,10 +44,12 @@ plain_mail_to_html=$base_dir/plain2html
 PYTHONPATH=$(dirname $base_dir):$PYTHONPATH
 export PYTHONPATH
 
-# Use sendmail (e.g. exim4, postfix)...
-# sendmail_cmd="/usr/sbin/sendmail -oi"
-# Or msmtp
-sendmail_cmd="/usr/bin/msmtp"
+
+config=~/.plain2htmlrc
+default_send_mail_cmd="/usr/sbin/sendmail -oi"
+sendmail_cmd=
+[[ -r $config ]] && . $config
+[[ -z $sendmail_cmd ]] && sendmail_cmd=$default_send_mail_cmd
 
 # exit cleanup handler
 on_exit()
