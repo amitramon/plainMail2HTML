@@ -18,11 +18,11 @@ rendered depends on the capabilities of the Email reader used by
 recipients of your Email. If you write in a *right-to-left* language,
 for example *Arabic* or *Hebrew*, many current Email readers still do
 not implement the Unicode Bidirectional algorithm and might render
-your message incorrectly.
+messages you send incorrectly.
 
 One method to overcome the above issues is using HTML Email, which can
 contain formatting and text direction information. This is where
-**plainMail2HTML** kicks in.
+**plainMail2HTML** can be of use.
 
 **plainMail2HTML** works as a filter—you pipe into it an Email object
 that contains only a text/plain component, and out comes an Email that
@@ -92,19 +92,19 @@ configuration variable—it should be set to the full path of the
 `html-sendmail` script.
 
 Assuming you installed plainMail2HTML in the directory
-`~/plainMail2HTML`, modify the `sendmail` setting in Mutt's
-configuration file (usually `~/.muttrc`) to read:
+`~/plainMail2HTML`, you'll need to modify the `sendmail` setting in
+Mutt's configuration file (usually `~/.muttrc`) to read:
 
     set sendmail = ~/plainMail2HTML/bin/html-sendmail
 
 #### Some Mutt Tricks
 
-You can define a shortcut key for dynamically switching between
-sending 'standard' text mail and HTML mail.
+You can setup Mutt to enable switching between sending 'standard' text
+mail and HTML mail dynamically using a shortcut key.
 
 To do that, copy the two Mutt scripts `sendmail-html.rc` and
-`sendmail-plain.rc` in the `doc/examples` directory to your `~/.mutt`
-directory. Then, in your `muttrc` file, replace the line
+`sendmail-plain.rc` from the `doc/examples` directory to your
+`~/.mutt` directory. Then, in your `muttrc` file, replace the line
 
     set sendmail = ~/plainMail2HTML/bin/html-sendmail
 
@@ -116,15 +116,42 @@ with the line
 script.)
 
 Now `Control+s` will switch between the two modes. In case you prefer
-a different shortcut, simply edit the two aforementioned Mutt scripts.
+a different shortcut, simply modify the two aforementioned Mutt
+scripts.
 
-The general idea is described in the
+The general idea this mechanism is based on is described in the
 [Mutt Wiki](https://dev.mutt.org/trac/wiki/ConfigTricks#abusemacrosasvariables).
+
+## Usage
+
+After the system is installed and Mutt, for instance, is configured to
+use it, you don't need to do anything special—you compose and send
+messages in the same way you've always done. The system will add a
+HTML component to each message when it is sent.
+
+The only difference is that now you can use markup in your text to
+format it. For example, if your text looks like this (reStructuredText
+is used),
+
+    This is *formatted* text sent with **plainMail2HTML**.
+	
+	* Apples
+	* Oranges
+	* Pears
+
+	Some code::
+	
+	    def bar():
+		    return 42
+
+a HTML Email reader would display it like that:
+
+![sample output](doc/images/sample-output-1.png)
 
 ## Notes
 
 **plainMail2HTML** works nicely with Mutt, but is far from being
-perfect. Here are some more technical details, issues and limitations
+perfect. Here are some        technical details, issues and limitations
 it has.
 
 ### How it works
@@ -146,13 +173,12 @@ able to handle any Email created by any Email client.
 ### Markup Parsing Errors
 
 Another thing to keep in mind is that improper markup format will
-cause the system to produce errors. This should be an acceptable
-feature, but could be annoying when replying to Emails you
-received. Text in your reply originating from the Email you're
-replying to might not be in a 'correct format' from the parser point
-of view, and, if you leave such text in your reply you might need to
-modify it in order for it to comply (another reason for using inline
-replying.)
+cause the system to produce errors. This feature is legitimate, but
+could be annoying when replying to Emails you received. Text in your
+reply originating from the Email you're replying to might not be in a
+'correct format' from the parser point of view, and, if you leave such
+text in your reply you might need to modify it in order for it to
+comply (another reason for using inline replying.)
 
 
 ### Limitations
