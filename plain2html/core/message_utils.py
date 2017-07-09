@@ -17,20 +17,18 @@
 
 """plainMail2HTML Email message utilities
 
-A couple of utilities for processing Email messages.
+Utilities for processing Email messages.
 """
 
 import re
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.feedparser import FeedParser
 from plain2html import settings
 
-# List of email headers that shouldn't
-# be copied when cloning a new message
-# from a different one.
-header_blacklist = ('content-disposition', 'content-type',
-                    'mime-version', 'content-transfer-encoding')
+# List of email headers that shouldn't be copied when cloning a new
+# multipart/alternative message from at existing text/plain one.
+header_blacklist = ('content-type', 'mime-version',
+                    'content-transfer-encoding')
 
 def is_header_okay(header):
     """Test that the header is allowed"""
@@ -41,10 +39,9 @@ def is_header_okay(header):
 def convert_text_to_alternative(msg):
     """Convert Email message type to multipart/alternative"""
     
-    # Create message container - the correct MIME type is multipart/alternative.
+    # Create message container - the correct MIME type is
+    # multipart/alternative.
     new_msg = MIMEMultipart('alternative')
-    new_msg.set_unixfrom(msg.get_unixfrom())
-    new_msg.set_charset(msg.get_charset())
     
     for key in list(msg.keys()):
         if is_header_okay(key):
@@ -52,19 +49,16 @@ def convert_text_to_alternative(msg):
 
     return new_msg
 
-
-def load_message(fp):
-    """Load an Email message from a file handle
-
-    Reads data from a file handler and parse it
-    to an Email message object.
-    """
-    parser = FeedParser()
-    for line in fp.readlines():
-        parser.feed(line)
+def clone_header(header, msg_src, msg_dest):
+    """ Clone Email header"""
     
-    return parser.close()
-        
+    value = msg_src[header]
+    if value is None:
+        return
+
+    del msg_dest[header]
+    msg_dest[header] = value
+
 
 def load_template(template, body):
     """Combine message body with a template"""

@@ -74,9 +74,9 @@ trap on_exit INT TERM EXIT
 # You can use lbdb (The Little Brother's Database) for extracting
 # Email addresses from Emails you send
 # Use lbdb:
-tee >(lbdb-fetchaddr -a -c utf-8) | $plain_mail_to_html > $tmpfile
+###tee >(lbdb-fetchaddr -a -c utf-8) | $plain_mail_to_html > $tmpfile
 # Don't use lbdb:
-# $plain_mail_to_html > $tmpfile
+$plain_mail_to_html > $tmpfile
 
 status=$?
 
@@ -87,7 +87,7 @@ then
 fi
 
 #--------------------------------------------------
-# parsed successfully, so send the mail
+# parsed successfully, go on and send the mail
 #--------------------------------------------------
 cat $tmpfile | $sendmail_cmd $@
 status=$?

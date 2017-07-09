@@ -42,13 +42,13 @@ def restructuredtext(text):
     parts = publish_parts(source=fixed_text, writer_name="html4css1",
                           settings_overrides=docutils_settings)
 
-    html_body = parts["html_body"].encode('utf-8')
+    html_body = parts["html_body"]
 
     # Insert the body into the template.
     html = load_template(settings.HTML_TEMPLATE, html_body)
 
     # Process the HTML in-place and add BIDI tags based on language
-    return hibidi.hibidi_str(html, encoding='utf-8')
+    return hibidi.hibidi_unicode(html)
 
 
 

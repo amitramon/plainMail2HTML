@@ -60,9 +60,12 @@ def get_args():
     
     parser = argparse.ArgumentParser(description=description, usage=__usage__)
     
-    parser.add_argument('-m', '--message_file', type=argparse.FileType('r'),
+    parser.add_argument('-m', '--message-file', type=argparse.FileType('r'),
                         default=sys.stdin,
                         help='an email file to process.')
+    
+    parser.add_argument('-b', '--allow-8bit', action='store_true',
+                        help='enable using 8bit for HTML message')
     
     return parser.parse_args()
 
@@ -77,13 +80,15 @@ def main():
         html_parser = get_callback(settings.HTML_PARSER)
 
         # Initialize a  MessageProcessor instance
-        mp = MessageProcessor(html_parser=html_parser)
+        mp = MessageProcessor(html_parser=html_parser,
+                              allow_8bit=args.allow_8bit)
         
         # Create the HTML part and attach it to the message
         html_msg = mp.generate_html_msg_from_file(args.message_file)
+                                                  
 
-        sys.stdout.write(str(html_msg))
-        
+        sys.stdout.write(html_msg.as_string())
+
     except Exception as e:
         if settings.DEBUG:
             import traceback
