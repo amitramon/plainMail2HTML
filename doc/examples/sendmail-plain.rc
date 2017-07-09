@@ -13,5 +13,5 @@ set sendmail = /usr/bin/msmtp
 set my_sendmail_desc="[Text]"
 
 macro generic,pager,compose "\cS" \
-"<enter-command> source ~/.mutt/sendmail-html.rc<enter>" \
+"<enter-command> source ~/.mutt/sendmail-html.rc<enter><refresh>" \
 "Toggle sent mail format (plain/html)."

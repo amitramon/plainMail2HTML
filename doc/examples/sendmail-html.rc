@@ -9,5 +9,5 @@ set sendmail = ~/plainMail2HTML/bin/html-sendmail
 set my_sendmail_desc="[HTML]"
 
 macro generic,pager,compose "\cS" \
-"<enter-command> source ~/.mutt/sendmail-plain.rc<enter>" \
+"<enter-command> source ~/.mutt/sendmail-plain.rc<enter><refresh>" \
 "Toggle sent mail format (plain/html)."
