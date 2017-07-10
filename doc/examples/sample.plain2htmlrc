@@ -5,6 +5,6 @@
 # Or msmtp
 sendmail_cmd=/usr/bin/msmtp
 
-# Additional flages for plain2html
+# Additional flags for plain2html
 p2h_flags=-b			# encode the HTML component in 8 bit.
 				# unset this variable to use base64.
