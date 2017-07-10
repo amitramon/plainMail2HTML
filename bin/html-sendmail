@@ -48,6 +48,8 @@ export PYTHONPATH
 config=~/.plain2htmlrc
 default_send_mail_cmd="/usr/sbin/sendmail -oi"
 sendmail_cmd=
+# flags to plain2html, can be set in config file
+p2h_flags=
 [[ -r $config ]] && . $config
 [[ -z $sendmail_cmd ]] && sendmail_cmd=$default_send_mail_cmd
 
@@ -76,7 +78,7 @@ trap on_exit INT TERM EXIT
 # Use lbdb:
 ###tee >(lbdb-fetchaddr -a -c utf-8) | $plain_mail_to_html > $tmpfile
 # Don't use lbdb:
-$plain_mail_to_html > $tmpfile
+$plain_mail_to_html $p2h_flags > $tmpfile
 
 status=$?
 
@@ -89,7 +91,7 @@ fi
 #--------------------------------------------------
 # parsed successfully, go on and send the mail
 #--------------------------------------------------
-cat $tmpfile | $sendmail_cmd $@
+$sendmail_cmd $@ < $tmpfile
 status=$?
 
 if (( $status ))
