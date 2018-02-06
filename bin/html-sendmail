@@ -41,7 +41,7 @@ export PATH
 
 base_dir=$(dirname $(realpath $0))
 plain_mail_to_html=$base_dir/plain2html
-PYTHONPATH=$(dirname $base_dir):$PYTHONPATH
+PYTHONPATH=$(dirname $base_dir):${PYTHONPATH:-}
 export PYTHONPATH
 
 
