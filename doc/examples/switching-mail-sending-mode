@@ -1,0 +1,60 @@
+# -*- muttrc -*-
+
+#----------------------------------------------------------------------
+# Selection of sending method - send messages "as is", i.e. text/plain,
+# or create & add a HTML mime part.
+#
+# The two methods are available to the user, who can switch the current
+# default using Ctrl-S.
+#
+# Messages are processed using the current default, unless they match one
+# of the predefined send2-hooks (see below). When a message matches a
+# hook's pattern, the hook's sending method will override, for the
+# current message only, the default method.
+#----------------------------------------------------------------------
+
+#----------------------------------------------------------------------
+# Set some path variables for convenience
+#----------------------------------------------------------------------
+set my_mutt_home = "/home/amit/.mutt"
+set my_sendmail_profiles_dir = "$my_mutt_home/sendmail-profiles"
+
+#----------------------------------------------------------------------
+# Set sending mail configuration, including the 'sendmail' command.
+# You can switch between the two configurations using Ctrl-S
+#----------------------------------------------------------------------
+# configuration for the "standard" send, no message modification
+set my_sendmail_plain_config = $my_sendmail_profiles_dir/sendmail-plain.rc
+
+# configuration for creating & adding a HTML mime part to sent messages
+set my_sendmail_html_config = $my_sendmail_profiles_dir/sendmail-html.rc
+
+# set the initial default sending method (to one of the above configurations)
+set my_default_sendmail_config = $my_sendmail_html_config
+
+# now load the initial default sendmail configuration:
+source $my_default_sendmail_config
+
+# helper for the hooks below
+group -group gmail-users -rx '.*@gmail.com'
+
+#----------------------------------------------------------------------
+# Send Hooks
+#----------------------------------------------------------------------
+# reset to the default configuration
+send-hook ~A 'source $my_default_sendmail_config'
+
+# set the 'sendmail' command to send the message as is (i.e., text/plain)
+# for recipient matching this hook's pattern.
+# set the patterns according to your need - in this example, any mail sent
+# to one of your known mailing lists will be sent as text/plain.
+send2-hook ~l 'source $my_sendmail_plain_config'
+
+# set the 'sendmail' command to send the message as HTML
+# for recipient matching this hook's pattern.
+# set the patterns according to your need - in this example, any mail
+# which is sent to a Gmail addres that is not a known mailing list
+# will be sent as HTML.
+send2-hook "!~l %C gmail-users" 'source $my_sendmail_html_config'
+
+

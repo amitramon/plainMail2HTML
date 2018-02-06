@@ -108,7 +108,7 @@ read:
 
     set sendmail = ~/plainMail2HTML/bin/html-sendmail
 
-#### Some Mutt Tricks
+#### Some Configuration Mutt Tricks
 
 You can setup Mutt to enable switching between sending 'standard' text
 mail and HTML mail dynamically using a shortcut key.
@@ -123,15 +123,24 @@ with the line
 
     source ~/.mutt/sendmail-html.rc
 
-(or, if you want plain text to be the default, source the other
-script.)
+(this will make sending HTML mail the default; if you prefer the
+default to be plain text, source the other script.)
 
-Now `Control+s` will switch between the two modes. In case you prefer
-a different shortcut, simply modify the two aforementioned Mutt
-scripts.
+Now `Control+s` will switch between the two modes. If you prefer a
+different key binding, modify the two aforementioned Mutt scripts.
 
 The general idea this mechanism is based on is described in the
-[Mutt Wiki](https://dev.mutt.org/trac/wiki/ConfigTricks#abusemacrosasvariables).
+[Mutt
+Wiki](https://dev.mutt.org/trac/wiki/ConfigTricks#abusemacrosasvariables).
+
+#### Automatic Selection of Mail Mode based on Recipients
+
+Using Mutt's built in hooks it is possible to set the Mail Mode
+(text/plain or HTML) automatically based on the message's attributes,
+e.g. its recipients.
+
+For detailed configuration example, see the sample Mutt script
+`switching-mail-sending-mode` under the `doc/examples` directory.
 
 ## Usage
 
